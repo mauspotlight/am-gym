@@ -23,7 +23,7 @@
   --good:#0E9F63; --good-soft:rgba(14,159,99,.12); --bad:#D93A3A; --bad-soft:rgba(217,58,58,.10);
   --p-blue:#2F6BFF; --p-red:#E5383B; --p-yellow:#E8AE00; --p-green:#16A34A; --p-white:#A9B0BC;
   --shadow:0 1px 2px rgba(20,22,27,.06),0 8px 24px rgba(20,22,27,.06);
-  --sheet:#FFFFFF; --scrim:rgba(10,12,16,.45);
+  --sheet:#FFFFFF; --scrim:rgba(10,12,16,.45); --on-good:#FFFFFF;
   --display:"Archivo","Arial Narrow",system-ui,sans-serif;
   --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -35,7 +35,7 @@
     --good:#2ED48A; --good-soft:rgba(46,212,138,.14); --bad:#FF6B6B; --bad-soft:rgba(255,107,107,.14);
     --p-blue:#4D82FF; --p-red:#FF5456; --p-yellow:#FFC61A; --p-green:#2BC766; --p-white:#C9CFD8;
     --shadow:0 1px 0 rgba(255,255,255,.03) inset,0 8px 24px rgba(0,0,0,.35);
-    --sheet:#16191E; --scrim:rgba(0,0,0,.6);
+    --sheet:#16191E; --scrim:rgba(0,0,0,.6); --on-good:#06140D;
   }
 }
 :root[data-theme="dark"]{
@@ -45,7 +45,7 @@
   --good:#2ED48A; --good-soft:rgba(46,212,138,.14); --bad:#FF6B6B; --bad-soft:rgba(255,107,107,.14);
   --p-blue:#4D82FF; --p-red:#FF5456; --p-yellow:#FFC61A; --p-green:#2BC766; --p-white:#C9CFD8;
   --shadow:0 1px 0 rgba(255,255,255,.03) inset,0 8px 24px rgba(0,0,0,.35);
-  --sheet:#16191E; --scrim:rgba(0,0,0,.6);
+  --sheet:#16191E; --scrim:rgba(0,0,0,.6); --on-good:#06140D;
 }
 *{box-sizing:border-box}
 html,body{background:var(--bg)}
@@ -72,6 +72,10 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .who-chip span{font-size:12px;color:var(--muted)}
 .icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line)}
 .icon-btn svg{width:20px;height:20px}
+.top-r{display:flex;align-items:center;gap:10px;min-width:0}
+.top-r .eyebrow{text-align:right;line-height:1.25}
+.theme-btn{flex:none;border-radius:50%;color:var(--ink)}
+.who-top{display:flex;justify-content:flex-end}
 
 /* who screen */
 .who{min-height:calc(100vh - 60px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding-block:24px}
@@ -97,7 +101,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .day-n{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted);display:flex;gap:8px;align-items:center}
 .day-t{font-family:var(--display);font-weight:800;font-stretch:85%;font-size:21px;line-height:1.1;margin-top:2px}
 .day-m{font-size:13px;color:var(--muted);margin-top:3px}
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:var(--c,var(--accent));color:#fff;text-transform:uppercase}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 8px;border-radius:999px;background:var(--c,var(--accent));color:var(--on-c,#fff);text-transform:uppercase}
 .chev{width:20px;height:20px;color:var(--muted)}
 .add-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:18px;border:1.5px dashed var(--line);color:var(--muted);font-weight:600;width:100%}
 .empty{padding:28px 20px;border-radius:20px;background:var(--surface);border:1px solid var(--line);text-align:center;display:grid;gap:10px;justify-items:center}
@@ -131,15 +135,15 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .ex-spark{width:64px;height:34px}
 .check{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:transparent;transition:all .2s ease}
 .check svg{width:22px;height:22px}
-.check[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#fff}
+.check[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:var(--on-good)}
 .ex.bumped{animation:bump .9s ease}
 @keyframes bump{0%{box-shadow:0 0 0 0 var(--good)}30%{transform:scale(1.02)}100%{box-shadow:0 0 0 14px transparent;transform:none}}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;border-radius:16px;font-weight:700;font-size:16px;width:100%}
 .btn svg{width:20px;height:20px;flex:none}
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
-.btn.primary:disabled{opacity:.45}
+.btn.primary:disabled{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
 .btn.ghost{background:var(--surface);border:1px solid var(--line)}
-.btn.good{background:var(--good);color:#fff}
+.btn.good{background:var(--good);color:var(--on-good)}
 .btn.danger{color:var(--bad);background:var(--bad-soft)}
 .btn.sm{height:40px;font-size:14px;border-radius:12px;width:auto;padding:0 14px}
 .finish{margin-top:18px;display:grid;gap:10px}
@@ -202,7 +206,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .heat .hl{font-size:9.5px;font-weight:700;color:var(--muted);display:grid;place-items:center;aspect-ratio:1}
 .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:10px}
 .wk span{height:22px;border-radius:6px;background:var(--surface-2);font-size:10px;font-weight:700;display:grid;place-items:center;color:var(--muted)}
-.wk span.on{color:#fff}
+.wk span.on{color:var(--on-c,#fff);text-shadow:0 0 2px rgba(0,0,0,.15)}
 .wk span.today{box-shadow:inset 0 0 0 1.5px var(--ink)}
 .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:12px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -296,6 +300,14 @@ const PLATES = {blue:'var(--p-blue)',red:'var(--p-red)',yellow:'var(--p-yellow)'
 const PEOPLE = [{id:'are',name:'Are',color:'red'},{id:'mau',name:'Mau',color:'blue'}];
 const MODES = [['kg','Kg'],['lado','Por lado'],['disco','Disco'],['barra','Barra'],['bw','Corporal']];
 const STEPS = [0.5,1,2.5,5];
+// texto legible sobre cada color de disco (el amarillo necesita texto oscuro)
+const ONC = {yellow:'#14161B'};
+const onc = color=>ONC[color]||'#fff';
+/* ---------- tema claro / oscuro ---------- */
+const THEME_KEY='gym.theme';
+function effTheme(){ const t=document.documentElement.dataset.theme; if(t==='light'||t==='dark') return t; try{return matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){return 'light'} }
+function applyTheme(t){ if(t==='light'||t==='dark') document.documentElement.dataset.theme=t; const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content=effTheme()==='dark'?'#0D0F12':'#EDEFF2'; }
+applyTheme((function(){try{return localStorage.getItem(THEME_KEY)}catch(e){return null}})());
 
 function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
@@ -417,6 +429,8 @@ function ring(done,total,color){
   return `<div class="ring" aria-label="${done} de ${total} ejercicios hechos"><svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r}" fill="none" stroke="var(--line)" stroke-width="5"/><circle cx="28" cy="28" r="${r}" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p)}" style="transition:stroke-dashoffset .4s ease"/></svg><b>${done}/${total}</b></div>`;
 }
 const I = {
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>',
+  sun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg>',
   chev:'<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
@@ -424,12 +438,13 @@ const I = {
   plus:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   tap:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 114 0v5m0-1a2 2 0 114 0v3a6 6 0 01-6 6h-.5a6 6 0 01-5-2.7L4 14.5a1.8 1.8 0 013-2L9 15"/></svg>'
 };
+const themeBtn = ()=>{const d=effTheme()==='dark';return `<button class="icon-btn theme-btn" data-act="theme" aria-label="${d?'Cambiar a modo claro':'Cambiar a modo oscuro'}" title="${d?'Modo claro':'Modo oscuro'}">${d?I.sun:I.moon}</button>`};
 const plate = (color,cls='')=>`<span class="plate ${cls}" style="--c:${PLATES[color]||PLATES.white}"></span>`;
 
 /* ---------- views ---------- */
 function topbar(){
   const p=PEOPLE.find(x=>x.id===S.person);
-  return `<div class="topbar"><button class="who-chip" data-act="switch" aria-label="Cambiar de persona">${plate(p.color,'sm')}<div style="text-align:left;line-height:1.1"><b>${p.name}</b><br><span>Cambiar</span></div></button><div class="eyebrow">${new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'})}</div></div>`;
+  return `<div class="topbar"><button class="who-chip" data-act="switch" aria-label="Cambiar de persona">${plate(p.color,'sm')}<div style="text-align:left;line-height:1.1"><b>${p.name}</b><br><span>Cambiar</span></div></button><div class="top-r"><div class="eyebrow">${new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'})}</div>${themeBtn()}</div></div>`;
 }
 function banner(){
   return S.dbState==='off'?`<div class="banner">No se pudo conectar con la base de datos. Revisa tu conexión a internet y vuelve a abrir la app.</div>`:'';
@@ -440,7 +455,7 @@ function viewWho(){
     const nd=S.profiles[p.id]?.days?.length||0;
     return `<button class="who-card" data-act="pick" data-p="${p.id}">${plate(p.color)}<div class="meta">${nd?`${nd} días de rutina`:'Rutina por cargar'}<br>${last?`Entrenó ${relDay(last)}`:'Sin sesiones aún'}</div><div class="name">${p.name}</div></button>`;
   }).join('');
-  return `<section class="who fade-in"><div><div class="eyebrow" style="margin-bottom:10px">Gym · Registro de cargas</div><h1>¿Quién<br>entrena <em>hoy</em>?</h1></div><div class="who-grid">${cards}</div><p class="who-foot">Tu elección se recuerda en este teléfono. Puedes cambiarla arriba en cualquier momento.</p></section>`;
+  return `<section class="who fade-in"><div class="who-top">${themeBtn()}</div><div><div class="eyebrow" style="margin-bottom:10px">Gym · Registro de cargas</div><h1>¿Quién<br>entrena <em>hoy</em>?</h1></div><div class="who-grid">${cards}</div><p class="who-foot">Tu elección se recuerda en este teléfono. Puedes cambiarla arriba en cualquier momento.</p></section>`;
 }
 function viewDays(){
   const p=prof(); const person=PEOPLE.find(x=>x.id===S.person);
@@ -451,7 +466,7 @@ function viewDays(){
   } else {
     body=`<div class="days">`+p.days.map((d,i)=>{
       const l=lastDayDate(d.id); const isNext=l===today();
-      return `<button class="day ${isNext?'next':''}" style="--c:${PLATES[d.color]||PLATES.white}" data-act="open-day" data-d="${d.id}">${plate(d.color)}<div><div class="day-n">Día ${i+1}${isNext?`<span class="badge">Hoy</span>`:''}</div><div class="day-t">${esc(d.name)}</div><div class="day-m">${d.exercises.length} ejercicios · ${l?'última vez '+relDay(l):'aún sin entrenar'}</div></div>${I.chev}</button>`;
+      return `<button class="day ${isNext?'next':''}" style="--c:${PLATES[d.color]||PLATES.white};--on-c:${onc(d.color)}" data-act="open-day" data-d="${d.id}">${plate(d.color)}<div><div class="day-n">Día ${i+1}${isNext?`<span class="badge">Hoy</span>`:''}</div><div class="day-t">${esc(d.name)}</div><div class="day-m">${d.exercises.length} ejercicios · ${l?'última vez '+relDay(l):'aún sin entrenar'}</div></div>${I.chev}</button>`;
     }).join('')+`<button class="add-row" data-act="add-day">${I.plus} Nuevo día</button></div>`;
   }
   return `${topbar()}${banner()}<div class="hello fade-in"><h1>Hola, ${person.name}</h1><p>¿Qué día vas a trabajar?</p></div><div class="section-h"><span class="eyebrow">Tu rutina</span></div>${body}`;
@@ -496,7 +511,7 @@ function viewStats(){
   const tk=today();
   const bgFor=ids=>{const cs=(ids||[]).map(id=>dayOf(id)).filter(Boolean).map(d=>PLATES[d.color]||PLATES.white); if(!cs.length) return ''; if(cs.length===1) return `background:${cs[0]}`; const st=100/cs.length; return `background:linear-gradient(135deg,${cs.map((c,i)=>`${c} ${i*st}% ${(i+1)*st}%`).join(',')})`;};
   const WD=['L','M','M','J','V','S','D'];
-  const strip=WD.map((w,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const k=dkey(d);const bg=bgFor(byDate[k]);return `<span class="${bg?'on':''} ${k===tk?'today':''}" style="${bg}" title="${k}">${w}</span>`}).join('');
+  const strip=WD.map((w,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const k=dkey(d);const bg=bgFor(byDate[k]);const cs=(byDate[k]||[]).map(id=>dayOf(id)?.color);return `<span class="${bg?'on':''} ${k===tk?'today':''}" style="${bg};--on-c:${cs.length===1?onc(cs[0]):'#fff'}" title="${k}">${w}</span>`}).join('');
   // promedio de las últimas 4 semanas (incluida la actual)
   const m4=new Date(monday); m4.setDate(m4.getDate()-21); const avgWk=dates.filter(d=>d>=dkey(m4)&&d<=tk).length/4;
   const kpis=`<div class="kpis"><div class="kpi"><span class="eyebrow">Esta semana</span><b>${thisWeek}<span style="font-size:20px;color:var(--muted)">/7</span></b><div class="wk">${strip}</div></div><div class="kpi"><span class="eyebrow">Promedio</span><b>${fmtN(Math.round(avgWk*10)/10)}</b><small>días por semana (últimas 4)</small></div><div class="kpi"><span class="eyebrow">Racha</span><b>${streak}</b><small>${streak===1?'semana seguida':'semanas seguidas'}</small></div><div class="kpi"><span class="eyebrow">Subidas de peso</span><b>${ups}</b><small>incluye tu historial previo</small></div></div>`;
@@ -630,6 +645,7 @@ function act(a,el,ev){
   switch(a){
     case 'pick': S.person=el.dataset.p; lsSet('gym.person',S.person); S.view='days'; S.tab='train'; window.scrollTo(0,0); render(); break;
     case 'switch': S.view='who'; S.tab='train'; render(); window.scrollTo(0,0); break;
+    case 'theme': { const t=effTheme()==='dark'?'light':'dark'; lsSet(THEME_KEY,t); applyTheme(t); render(); break; }
     case 'tab': S.tab=el.dataset.tab; render(); window.scrollTo(0,0); break;
     case 'open-day': S.dayId=el.dataset.d; S.view='workout'; render(); window.scrollTo(0,0); break;
     case 'back': S.view='days'; render(); window.scrollTo(0,0); break;
