@@ -82,11 +82,11 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .who h1{font-size:clamp(44px,13vw,64px);line-height:.92;font-stretch:72%;font-weight:900;letter-spacing:-.01em;text-transform:uppercase}
 .who h1 em{font-style:normal;color:var(--accent)}
 .who-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.who-card{position:relative;overflow:hidden;text-align:left;padding:18px 16px 16px;border-radius:22px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:30px;min-height:210px;transition:transform .15s ease}
+.who-card{position:relative;overflow:hidden;text-align:left;padding:18px 16px 16px;border-radius:22px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:22px;min-height:170px;transition:transform .15s ease}
 .who-card:active{transform:scale(.97)}
 .who-card .plate{width:96px;height:96px;position:absolute;right:-22px;top:-22px}
-.who-card .name{font-family:var(--display);font-weight:900;font-stretch:75%;font-size:46px;line-height:.9;text-transform:uppercase;margin-top:auto}
-.who-card .meta{font-size:12.5px;color:var(--muted)}
+.who-card .name{font-family:var(--display);font-weight:900;font-stretch:75%;font-size:clamp(32px,10vw,46px);line-height:.9;text-transform:uppercase;margin-top:auto}
+.who-card .meta{font-size:12.5px;color:var(--muted);margin-top:-12px}
 .who-foot{font-size:13px;color:var(--muted)}
 
 /* days */
@@ -297,7 +297,7 @@ window.getDb = async function(){
 <script>
 (function(){
 const PLATES = {blue:'var(--p-blue)',red:'var(--p-red)',yellow:'var(--p-yellow)',green:'var(--p-green)',white:'var(--p-white)'};
-const PEOPLE = [{id:'are',name:'Are',color:'red'},{id:'mau',name:'Mau',color:'blue'}];
+const PEOPLE = [{id:'are',name:'Are',color:'red'},{id:'mau',name:'Mau',color:'blue'},{id:'dani',name:'Dani',color:'yellow'},{id:'oscar',name:'Oscar',color:'green'}];
 const MODES = [['kg','Kg'],['lado','Por lado'],['disco','Disco'],['barra','Barra'],['bw','Corporal']];
 const STEPS = [0.5,1,2.5,5];
 // texto legible sobre cada color de disco (el amarillo necesita texto oscuro)
@@ -329,7 +329,7 @@ const today = ()=>dkey(new Date());
 const parseKey = k=>{const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
 const daysBetween = (a,b)=>Math.round((parseKey(b)-parseKey(a))/864e5);
 const fmtDate = iso=>{ if(!iso) return 'Antes de la app'; const d=new Date(iso); return d.toLocaleDateString('es-PE',{day:'numeric',month:'short'}).replace('.',''); };
-function relDay(k){ if(!k) return 'sin registro'; const n=daysBetween(k,today()); if(n<=0) return 'hoy'; if(n===1) return 'ayer'; if(n<7) return `hace ${n} días`; return fmtDate(parseKey(k).toISOString()); }
+function relDay(k){ if(!k) return 'sin registro'; const n=daysBetween(k,today()); if(n<=0) return 'hoy'; if(n===1) return 'ayer'; return `hace ${n} días`; }
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),2400)}
 function buzz(){try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}}
 
@@ -453,7 +453,7 @@ function viewWho(){
   const cards=PEOPLE.map(p=>{
     const ss=sessionsOf(p.id); const last=ss.reduce((a,s)=>!a||s.date>a?s.date:a,null);
     const nd=S.profiles[p.id]?.days?.length||0;
-    return `<button class="who-card" data-act="pick" data-p="${p.id}">${plate(p.color)}<div class="meta">${nd?`${nd} días de rutina`:'Rutina por cargar'}<br>${last?`Entrenó ${relDay(last)}`:'Sin sesiones aún'}</div><div class="name">${p.name}</div></button>`;
+    return `<button class="who-card" data-act="pick" data-p="${p.id}">${plate(p.color)}<div class="name">${p.name}</div><div class="meta">${nd?`${nd} ${nd===1?'día':'días'} de rutina`:'Rutina por cargar'}<br>${last?`Entrenó ${relDay(last)}`:'Sin sesiones aún'}</div></button>`;
   }).join('');
   return `<section class="who fade-in"><div class="who-top">${themeBtn()}</div><div><div class="eyebrow" style="margin-bottom:10px">Gym · Registro de cargas</div><h1>¿Quién<br>entrena <em>hoy</em>?</h1></div><div class="who-grid">${cards}</div><p class="who-foot">Tu elección se recuerda en este teléfono. Puedes cambiarla arriba en cualquier momento.</p></section>`;
 }
