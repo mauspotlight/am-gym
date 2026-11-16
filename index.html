@@ -143,6 +143,21 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
 .chip.down{background:var(--bad-soft);color:var(--bad)}
 .chip.flat{background:var(--surface-2);color:var(--muted)}
 .chip.new{background:var(--accent-soft);color:var(--accent)}
+.sr{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.sr.custom{color:var(--accent)}
+.sr-link{font-size:12.5px;color:var(--muted);text-align:right}
+.sr-link b{color:var(--ink);font-variant-numeric:tabular-nums}
+.sr-link span{color:var(--accent);font-weight:700}
+.sr-step{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
+.sr-col{flex:1;display:grid;gap:6px}
+.sr-ctl{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:6px}
+.sr-ctl button{height:48px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);font-size:24px;font-weight:700}
+.sr-ctl button:active{background:var(--accent-soft)}
+.sr-ctl b{text-align:center;font-family:var(--display);font-size:30px;font-weight:900;font-stretch:80%;font-variant-numeric:tabular-nums}
+.sr-x{font-family:var(--display);font-size:24px;font-weight:800;color:var(--muted);padding-bottom:10px}
+.sr-note{font-size:13px;color:var(--muted);margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sr-note button{color:var(--accent);font-weight:700}
+.hist .srh{color:var(--muted);font-weight:600}
 .ex-spark{width:64px;height:34px}
 .check{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:transparent;transition:all .2s ease}
 .check svg{width:22px;height:22px}
@@ -376,6 +391,13 @@ function lastDayDate(dayId,p=S.person){ let best=null; for(const s of sessionsOf
 function dayOf(id){ return prof()?.days?.find(d=>d.id===id); }
 // Nombre corto para Progreso (si la rutina lo define)
 const sName=d=>d?.short||d?.name||'';
+/* ---------- series y repeticiones ---------- */
+const SR_DEF={s:4,r:10};
+const defSR=()=>({s:prof()?.sets||SR_DEF.s, r:prof()?.reps||SR_DEF.r});
+const exSR=ex=>{const g=defSR(); return {s:ex?.sets||g.s, r:ex?.reps||g.r, custom:!!(ex&&(ex.sets||ex.reps))};};
+const srTxt=o=>`${o.s} × ${o.r}`;
+function ensureProfile(){ if(!S.profiles[S.person]) S.profiles[S.person]={name:PEOPLE.find(p=>p.id===S.person).name,unit:'kg',days:[]}; return prof(); }
+function srStepper(o){ return `<div class="sr-step"><div class="sr-col"><span class="lbl">Series</span><div class="sr-ctl"><button data-act="sr-step" data-k="s" data-d="-1" aria-label="Menos series">−</button><b id="sr_s">${o.s}</b><button data-act="sr-step" data-k="s" data-d="1" aria-label="Más series">+</button></div></div><span class="sr-x">×</span><div class="sr-col"><span class="lbl">Repeticiones</span><div class="sr-ctl"><button data-act="sr-step" data-k="r" data-d="-1" aria-label="Menos repeticiones">−</button><b id="sr_r">${o.r}</b><button data-act="sr-step" data-k="r" data-d="1" aria-label="Más repeticiones">+</button></div></div></div>`; }
 function exGain(ex,p=S.person){
   const es=entriesOf(ex.id,p).filter(isNum); if(!es.length) return null;
   const last=es[es.length-1]; const same=es.filter(e=>e.m===last.m); const first=same[0];
@@ -490,14 +512,15 @@ function viewDays(){
       return `<button class="day ${isNext?'next':''}" style="--c:${PLATES[d.color]||PLATES.white};--on-c:${onc(d.color)}" data-act="open-day" data-d="${d.id}">${plate(d.color)}<div><div class="day-n">Día ${i+1}${isNext?`<span class="badge">Hoy</span>`:''}</div><div class="day-t">${esc(d.name)}</div><div class="day-m">${d.exercises.length} ejercicios · ${l?'última vez '+relDay(l):'aún sin entrenar'}</div></div>${I.chev}</button>`;
     }).join('')+`<button class="add-row" data-act="add-day">${I.plus} Nuevo día</button></div>`;
   }
-  return `${topbar()}${banner()}<div class="hello fade-in"><h1>Hola, ${person.name}</h1><p>¿Qué día vas a trabajar?</p></div><div class="section-h"><span class="eyebrow">Tu rutina</span></div>${body}`;
+  return `${topbar()}${banner()}<div class="hello fade-in"><h1>Hola, ${person.name}</h1><p>¿Qué día vas a trabajar?</p></div><div class="section-h"><span class="eyebrow">Tu rutina</span><button class="sr-link" data-act="sr-general">Series y reps: <b>${srTxt(defSR())}</b> · <span>Cambiar</span></button></div>${body}`;
 }
 function exCard(ex,color){
   const es=entriesOf(ex.id); const cur=es[es.length-1]; const prev=es[es.length-2];
   const d=delta(prev,cur); const p=parts(cur); const done=isDone(ex.id);
   const vals=es.filter(e=>isNum(e)&&cur&&e.m===cur.m).map(e=>e.w);
   const upToday=cur&&cur.at&&dkey(new Date(cur.at))===today();
-  let meta = !cur ? 'Toca para registrar tu primer peso' : `${es.length} ${es.length===1?'registro':'registros'} · ${upToday?'actualizado hoy':cur.at?'desde el '+fmtDate(cur.at):'dato previo a la app'}`;
+  const sr=exSR(ex); const srH=`<span class="sr ${sr.custom?'custom':''}">${srTxt(sr)}</span> · `;
+  let meta = srH + (!cur ? 'Toca para registrar tu primer peso' : `${es.length} ${es.length===1?'registro':'registros'} · ${upToday?'actualizado hoy':cur.at?'desde el '+fmtDate(cur.at):'dato previo a la app'}`);
   const load = !cur ? `<span class="bw muted">Sin peso aún</span>` : p.bw ? `<span class="bw">Peso corporal</span>` : `${p.pre?`<span class="pre">${p.pre}</span>`:''}<b>${p.n}</b><span class="u">${p.u}</span> ${upToday&&d>0?`<span class="chip new">nuevo</span>`:''}${deltaChip(d)}`;
   return `<div class="ex ${done?'is-done':''} ${S.bumped===ex.id?'bumped':''}" data-act="open-ex" data-ex="${ex.id}" role="button" tabindex="0" aria-label="${esc(ex.name)}, ${esc(txt(cur))}"><div><div class="ex-name">${esc(ex.name)}</div><div class="ex-load">${load}</div><div class="ex-meta">${meta}</div></div>${spark(vals,color)}<button class="check" data-act="toggle-done" data-ex="${ex.id}" aria-pressed="${done}" aria-label="Marcar ${esc(ex.name)} como hecho">${I.check}</button></div>`;
 }
@@ -607,9 +630,9 @@ function exSheet(exId){
   const d=dayOf(S.dayId); const ex=d.exercises.find(e=>e.id===exId); if(!ex) return;
   const es=entriesOf(exId); const cur=es[es.length-1]; const color=PLATES[d.color]||PLATES.white;
   const m=cur?.m||ex.mode||'kg'; const w=cur&&isNum(cur)?cur.w:0;
-  S.sheet={kind:'ex',exId}; S.draft={exId,w,m,step:w>=20?2.5:w>=10?2.5:1,confirm:null};
+  S.sheet={kind:'ex',exId}; S.draft={exId,w,m,step:w>=20?2.5:w>=10?2.5:1,confirm:null}; S.sr={target:'ex',exId,...exSR(ex)};
   const p=parts(cur);
-  const hist=[...es].map((e,i)=>({e,d:delta(es[i-1],e)})).reverse().map(({e,d},i)=>`<li><span class="dot"></span><div><div class="v">${esc(txt(e))}</div><div class="d">${esc(fmtDate(e.at))}</div></div><div style="display:flex;gap:8px;align-items:center">${deltaChip(d)}${i===0?`<button class="icon-btn" style="width:34px;height:34px" data-act="ask-del-entry" aria-label="Borrar este registro">${I.x}</button>`:''}</div></li>`).join('');
+  const hist=[...es].map((e,i)=>({e,d:delta(es[i-1],e)})).reverse().map(({e,d},i)=>`<li><span class="dot"></span><div><div class="v">${esc(txt(e))}${e.s?` <span class="srh">· ${e.s} × ${e.r}</span>`:''}</div><div class="d">${esc(fmtDate(e.at))}</div></div><div style="display:flex;gap:8px;align-items:center">${deltaChip(d)}${i===0?`<button class="icon-btn" style="width:34px;height:34px" data-act="ask-del-entry" aria-label="Borrar este registro">${I.x}</button>`:''}</div></li>`).join('');
   openSheet(`<div class="sh-head"><div><div class="day-n">${plate(d.color,'xs')} ${esc(d.name)}</div><h2>${esc(ex.name)}</h2></div><button class="icon-btn" data-act="close-sheet" aria-label="Cerrar">${I.x}</button></div>
   <div class="sh-sec"><div class="lbl">Carga actual</div><div class="current">${!cur?'<b style="font-size:34px">Sin peso</b>':p.bw?'<b style="font-size:38px">Peso corporal</b>':`${p.pre?`<span class="u">${p.pre}</span>`:''}<b>${p.n}</b><span class="u">${p.u}</span>`}</div></div>
   <div class="sh-sec"><div class="lbl">Nuevo peso</div>
@@ -620,10 +643,23 @@ function exSheet(exId){
     </div>
   </div>
   <div class="sh-actions"><button class="btn primary" id="saveBtn" data-act="save-w"></button><button class="btn ghost" data-act="same-w">${I.check} Hice el mismo peso</button></div>
+  <div class="sh-sec"><div class="lbl">Series y repeticiones</div>${srStepper(exSR(ex))}<div class="sr-note" id="srNote"></div></div>
   <div class="sh-sec"><div class="lbl">Progresión</div>${bigChart(es,color)}</div>
   <div class="sh-sec"><div class="lbl">Historial</div><div id="delBox"></div>${es.length?`<ul class="hist">${hist}</ul>`:`<p class="muted">Todavía no hay registros.</p>`}</div>
   <div class="sh-sec"><button class="btn danger sm" data-act="ask-rm-ex">Quitar de la rutina</button><div id="rmBox"></div></div>`);
-  updateSave();
+  updateSave(); srNote();
+}
+function srNote(){
+  const n=$('#srNote'); if(!n||!S.sr||S.sr.target!=='ex') return;
+  const g=defSR(); const ex=dayOf(S.dayId)?.exercises.find(e=>e.id===S.sr.exId); const c=exSR(ex);
+  n.innerHTML=c.custom?`Personalizado para este ejercicio <button data-act="sr-reset">Volver al general (${srTxt(g)})</button>`:`Igual que el general (${srTxt(g)}). Si lo cambias, solo afecta a este ejercicio.`;
+}
+function srSheet(){
+  S.sheet={kind:'sr'}; S.sr={target:'general',...defSR()};
+  openSheet(`<div class="sh-head"><h2>Series y repeticiones</h2><button class="icon-btn" data-act="close-sheet" aria-label="Cerrar">${I.x}</button></div>
+  <p class="muted" style="margin:6px 0 0">Se usa en todos tus ejercicios. Si quieres otro valor en alguno, cámbialo dentro de ese ejercicio.</p>
+  ${srStepper(S.sr)}
+  <div class="sh-actions"><button class="btn primary" data-act="sr-save">Guardar</button></div>`);
 }
 function updateSave(){
   const b=$('#saveBtn'); if(!b||!S.draft) return;
@@ -678,13 +714,19 @@ function act(a,el,ev){
     case 'back': S.view='days'; render(); window.scrollTo(0,0); break;
     case 'open-ex': exSheet(el.dataset.ex); break;
     case 'toggle-done': { const id=el.dataset.ex; const on=!isDone(id); setDone(id,on); buzz(); render(); if(on){const dd=dayOf(S.dayId);if(dd.exercises.every(e=>isDone(e.id)))toast('¡Día completo! Toca Terminar entrenamiento.')} break; }
-    case 'close-sheet': closeSheet(); break;
+    case 'close-sheet': { const k=S.sheet?.kind; closeSheet(); if(k==='ex') render(); break; }
+    case 'sr-general': srSheet(); break;
+    case 'sr-step': { const k=el.dataset.k, mx=k==='s'?10:50; S.sr[k]=Math.min(mx,Math.max(1,S.sr[k]+Number(el.dataset.d))); $('#sr_'+k).textContent=S.sr[k]; buzz();
+      if(S.sr.target==='ex'){ const ex=dayOf(S.dayId)?.exercises.find(e=>e.id===S.sr.exId); if(ex){ const g=defSR(); if(S.sr.s===g.s&&S.sr.r===g.r){ delete ex.sets; delete ex.reps; } else { ex.sets=S.sr.s; ex.reps=S.sr.r; } writeProfile(); srNote(); } }
+      break; }
+    case 'sr-save': { const p=ensureProfile(); p.sets=S.sr.s; p.reps=S.sr.r; writeProfile(); closeSheet(); render(); toast('Ahora: '+srTxt(S.sr)+' en todos tus ejercicios'); break; }
+    case 'sr-reset': { const ex=dayOf(S.dayId)?.exercises.find(e=>e.id===S.sr.exId); if(ex){ delete ex.sets; delete ex.reps; writeProfile(); const g=defSR(); S.sr.s=g.s; S.sr.r=g.r; $('#sr_s').textContent=g.s; $('#sr_r').textContent=g.r; srNote(); } break; }
     case 'mode': S.draft.m=el.dataset.m; $('#modeSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.draft.m)); $('#weightBox').hidden=S.draft.m==='bw'; if(isNaN(S.draft.w))S.draft.w=0; updateSave(); break;
     case 'step': { readInput(); const base=isNaN(S.draft.w)?0:S.draft.w; S.draft.w=Math.max(0,r2(base+Number(el.dataset.dir)*S.draft.step)); $('#wInput').value=fmtN(S.draft.w); buzz(); updateSave(); break; }
     case 'stepsize': S.draft.step=Number(el.dataset.s); $('#stepSeg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.s)===S.draft.step)); break;
     case 'save-w': {
       readInput(); const {exId,m}=S.draft; const w=m==='bw'?null:S.draft.w; if(m!=='bw'&&!(w>=0)) return;
-      const id=logId(exId); const e={w,m,at:atFor()}; const list=insertEntry(entriesOf(exId),e); const prev=list[list.indexOf(e)-1];
+      const id=logId(exId); const _sr=exSR(dayOf(S.dayId)?.exercises.find(x=>x.id===exId)); const e={w,m,at:atFor(),s:_sr.s,r:_sr.r}; const list=insertEntry(entriesOf(exId),e); const prev=list[list.indexOf(e)-1];
       S.logs[id]={person:S.person,exId,entries:list}; writeLog(exId);
       setDone(exId,true); const d=delta(prev,e); S.bumped=exId; closeSheet(); render(); buzz();
       toast(d>0?`¡Subiste! ${txt(e)} (+${fmtN(d)})`:`Guardado: ${txt(e)}`); break; }
